@@ -1,4 +1,4 @@
-chmlib: CHM lib 0.37.4 - Library for dealing with Microsoft ITSS/CHM files
+chmlib: CHM lib 0.38 - Library for dealing with Microsoft ITSS/CHM files
 chmlib:
 chmlib: CHMLIB is a library for dealing with Microsoft ITSS/CHM format files.
 chmlib: Right now, it is a very simple library, but sufficient for dealing with

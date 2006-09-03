@@ -1,5 +1,5 @@
 #!/bin/sh
-# Slackware build script for chmlib 0.37.4
+# Slackware build script for chmlib 0.38
 # Copyright (C) 2006 Georgi D. Sotirov <gdsotirov@dir.bg>
 #
 # This program is free software; you can redistribute it and/or
@@ -16,8 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 # 
-# $Id: chmlib.SlackBuild,v 1.1 2006/03/04 09:11:00 gsotirov Exp $
-#
+# $Id: chmlib.SlackBuild,v 1.2 2006/09/03 10:51:35 gsotirov Exp $
 
 . /etc/slack-package.conf
 
@@ -27,8 +26,7 @@ if [ "x$TMP" = "x" ]; then
 fi
 
 NAME=chmlib
-VERSION=0.37.4
-SVERSION=0.37
+VERSION=0.38
 BUILD=1
 
 PKG=$TMP/package-$NAME
@@ -38,36 +36,23 @@ if [ ! -d $TMP ]; then
 fi
 if [ ! -d $PKG ]; then
   mkdir -p $PKG # place for the package to be built
-fi
+fi 
 
 # Extract the sources
-SRC=$NAME-$SVERSION
+SRC=$NAME-$VERSION
 cd $TMP
-echo "Extracting the sources of $SRC..."
-tar -xzvf $CWD/$NAME-$VERSION.tgz 1> /dev/null 2>&1
+tar -zxvf $CWD/$SRC.tar.gz
 cd $SRC
-
 fix_source
+CFLAGS=$SLKCFLAGS ./configure --build=$ARCH-pc-linux-gnu \
+                              --prefix=/usr \
+                              --enable-examples
 
-echo "Configuring $SRC..."
-CFLAGS=$CFLAGS ./configure --prefix=/usr \
-            --localstatedir=/var \
-            --sysconfdir=/etc \
-            1> $CWD/$NAME-configure.log 2>&1
-echo "Building $SRC..."
-CFLAGS=$CFLAGS make 1> $CWD/$NAME-make.log 2>&1
-CFLAGS=$CFLAGS make examples 1>> $CWD/$NAME-make.log 2>&1
-make DESTDIR=$PKG install 1> $CWD/$NAME-install.log 2>&1
-
-# Copy examples
-EXAMPLES='chm_http enum_chmLib enumdir_chmLib extract_chmLib test_chmLib'
-mkdir -p $PKG/usr/bin
-for EXAMPLE in $EXAMPLES; do
-  cp $EXAMPLE $PKG/usr/bin
-done
+# Build & install
+make
+make DESTDIR=$PKG install
 
 # Strip binaries
-echo "Preparing $SRC package..."
 strip_bin $PKG
 strip_lib $PKG
 strip_static $PKG
@@ -75,32 +60,27 @@ strip_static $PKG
 # Set permissions
 chown -R root.root $PKG
 bin_perms $PKG
-sbin_perms $PKG
 
 # Create documentation
 create_docs $PKG $SRC
 
 # Include service info
-echo "Creating service infos for $SRC..."
-mkdir -p $PKG/install
-cp $CWD/$SRC.txt $PKG/install/slack-desc
-mkdir -p $PKG/usr/src/slackbuilds/$NAME-$VERSION
-cp $CWD/$NAME.SlackBuild $PKG/usr/src/slackbuilds/$NAME-$VERSION
+install -d -m 755 $PKG/install
+install -m 644 $CWD/slack-desc $PKG/install/slack-desc
+install -d -m 755 $PKG/usr/src/slackbuilds/$SRC
+install -m 644 $CWD/$NAME.SlackBuild $PKG/usr/src/slackbuilds/$SRC
+install -m 644 $CWD/slack-desc $PKG/usr/src/slackbuilds/$SRC
 
 # Build the package:
-echo "Building $SRC package..."
 cd $PKG
-makepkg -l y -c n $TMP/$NAME-$VERSION-$ARCH-$BUILD$MYIN.tgz 1> $CWD/$NAME-makepkg.log 2>&1
-cd $TMP
-md5sum $NAME-$VERSION-$ARCH-$BUILD.tgz > $NAME-$VERSION-$ARCH-$BUILD$MYIN.tgz.md5
-cp $CWD/$SRC.txt $TMP/$NAME-$VERSION-$ARCH-$BUILD$MYIN.txt
+PACKNAME=$NAME-$VERSION-$ARCH-$BUILD$MYIN
+makepkg -l y -c n $TMP/$PACKNAME.tgz
+md5sum $TMP/$PACKNAME.tgz > $TMP/$PACKNAME.tgz.md5
+cp $CWD/slack-desc $TMP/$PACKNAME.txt
 
 # Cleanup (optionally)
 if [ "$1" = "--cleanup" ]; then
-  echo "Cleaning up..."
   rm -rf $TMP/$SRC
   rm -rf $PKG
 fi
-
-echo "All done."
 
