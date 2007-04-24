@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 # 
-# $Id: chmlib.SlackBuild,v 1.3 2007/01/05 21:41:28 gsotirov Exp $
+# $Id: chmlib.SlackBuild,v 1.4 2007/04/24 20:51:00 gsotirov Exp $
 #
 
 . /etc/slack-package.conf
@@ -27,7 +27,7 @@ if [ "x$TMP" = "x" ]; then
 fi
 
 NAME=chmlib
-VERSION=0.38
+VERSION=0.39
 BUILD=1
 
 PKG=$TMP/package-$NAME
@@ -42,7 +42,7 @@ fi
 # Extract the sources
 SRC=$NAME-$VERSION
 cd $TMP
-tar -zxvf $CWD/$SRC.tar.gz
+tar -jxvf $CWD/$SRC.tar.bz2
 cd $SRC
 fix_source
 CFLAGS=$SLKCFLAGS ./configure --build=$ARCH-pc-linux-gnu \
