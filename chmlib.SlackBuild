@@ -1,5 +1,5 @@
 #!/bin/sh
-# Slackware build script for chmlib 0.38
+# Slackware build script for chmlib
 # Copyright (C) 2006-2007 Georgi D. Sotirov <gdsotirov@dir.bg>
 #
 # This program is free software; you can redistribute it and/or
@@ -16,10 +16,10 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 # 
-# $Id: chmlib.SlackBuild,v 1.4 2007/04/24 20:51:00 gsotirov Exp $
+# $Id: chmlib.SlackBuild,v 1.5 2007/09/17 19:32:08 gsotirov Exp $
 #
 
-. /etc/slack-package.conf
+. ../slack-package.conf
 
 # Set initial variables
 if [ "x$TMP" = "x" ]; then
@@ -45,19 +45,20 @@ cd $TMP
 tar -jxvf $CWD/$SRC.tar.bz2
 cd $SRC
 fix_source
-CFLAGS=$SLKCFLAGS ./configure --build=$ARCH-pc-linux-gnu \
-                              --prefix=/usr \
-                              --enable-examples
+CFLAGS=$SLKCFLAGS \
+./configure --build=$ARCH-slackware-linux \
+            --host=$ARCH-slackware-linux \
+            --prefix=/usr \
+            --enable-shared=yes \
+            --enable-static=no \
+            --enable-examples
 
 # Build & install
 make
 make DESTDIR=$PKG install
 
 # Strip binaries
-( cd $PKG
-  strip_bin
-  strip_lib
-  strip_static )
+( cd $PKG; strip_bin; strip_lib )
 
 # Set permissions
 chown -R root.root $PKG
@@ -69,6 +70,7 @@ create_docs $PKG $SRC
 # Include service info
 install -d -m 755 $PKG/install
 install -m 644 $CWD/slack-desc $PKG/install/slack-desc
+
 install -d -m 755 $PKG/usr/src/slackbuilds/$SRC
 install -m 644 $CWD/$NAME.SlackBuild $PKG/usr/src/slackbuilds/$SRC
 install -m 644 $CWD/slack-desc $PKG/usr/src/slackbuilds/$SRC
