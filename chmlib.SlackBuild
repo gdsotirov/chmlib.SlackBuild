@@ -1,6 +1,6 @@
 #!/bin/sh
 # Slackware build script for chmlib
-# Copyright (C) 2006-2007 Georgi D. Sotirov <gdsotirov@dir.bg>
+# Copyright (C) 2006-2008 Georgi D. Sotirov <gdsotirov@dir.bg>
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 # 
-# $Id: chmlib.SlackBuild,v 1.5 2007/09/17 19:32:08 gsotirov Exp $
+# $Id: chmlib.SlackBuild,v 1.6 2008/10/18 14:31:36 gsotirov Exp $
 #
 
 . ../slack-package.conf
@@ -54,8 +54,8 @@ CFLAGS=$SLKCFLAGS \
             --enable-examples
 
 # Build & install
-make
-make DESTDIR=$PKG install
+make -j4 || exit 1
+make DESTDIR=$PKG install || exit 2
 
 # Strip binaries
 ( cd $PKG; strip_bin; strip_lib )
