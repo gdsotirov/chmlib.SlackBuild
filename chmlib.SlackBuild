@@ -1,6 +1,6 @@
 #!/bin/sh
 # Slackware build script for chmlib
-# Copyright (C) 2006-2008 Georgi D. Sotirov <gdsotirov@dir.bg>
+# Copyright (C) 2006-2009 Georgi D. Sotirov <gdsotirov@dir.bg>
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -16,28 +16,35 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 # 
-# $Id: chmlib.SlackBuild,v 1.6 2008/10/18 14:31:36 gsotirov Exp $
+# $Id: chmlib.SlackBuild,v 1.7 2009/10/28 15:11:59 gsotirov Exp $
 #
 
 . ../slack-package.conf
 
-# Set initial variables
-if [ "x$TMP" = "x" ]; then
-  TMP=/tmp
-fi
-
 NAME=chmlib
-VERSION=0.39
-BUILD=1
+VERSION=0.40
+BUILD=${BUILD:-1}
+ARCH=${ARCH:-i486}
 
-PKG=$TMP/package-$NAME
+TMP=${TMP:-/tmp}
+CWD=${CWD:-`pwd`}
 
-if [ ! -d $TMP ]; then
+if [ ! -e $TMP ]; then
   mkdir -p $TMP # location to build the source
 fi
-if [ ! -d $PKG ]; then
-  mkdir -p $PKG # place for the package to be built
-fi 
+
+SRC=$TMP/$NAME-$VERSION
+if [ -e $SRC -a -d $SRC ]; then
+  echo "Source directory '$SRC' already exists! Plaese, move it or remove it."
+  exit 1
+fi
+
+PKG=$TMP/package-$NAME
+if [ -e $PKG -a -d $PKG ]; then
+  echo "Package creation directory '$PKG' already exists! Please, move it or remove it."
+  exit 2
+fi
+mkdir -p $PKG
 
 # Extract the sources
 SRC=$NAME-$VERSION
@@ -45,6 +52,8 @@ cd $TMP
 tar -jxvf $CWD/$SRC.tar.bz2
 cd $SRC
 fix_source
+
+# Configure
 CFLAGS=$SLKCFLAGS \
 ./configure --build=$ARCH-slackware-linux \
             --host=$ARCH-slackware-linux \
@@ -57,23 +66,20 @@ CFLAGS=$SLKCFLAGS \
 make -j4 || exit 1
 make DESTDIR=$PKG install || exit 2
 
-# Strip binaries
-( cd $PKG; strip_bin; strip_lib )
-
-# Set permissions
+# Prepare
 chown -R root.root $PKG
 bin_perms $PKG
+( cd $PKG; strip_bin; strip_lib )
+( cd $SRC; create_docs $PKG $NAME-$VERSION )
 
-# Create documentation
-create_docs $PKG $SRC
-
-# Include service info
 install -d -m 755 $PKG/install
-install -m 644 $CWD/slack-desc $PKG/install/slack-desc
+install -m 644 $CWD/slack-desc     $PKG/install/slack-desc
+install -m 644 $CWD/slack-required $PKG/install/slack-required
 
 install -d -m 755 $PKG/usr/src/slackbuilds/$SRC
-install -m 644 $CWD/$NAME.SlackBuild $PKG/usr/src/slackbuilds/$SRC
-install -m 644 $CWD/slack-desc $PKG/usr/src/slackbuilds/$SRC
+install -m 644 $CWD/slack-desc       $PKG/usr/src/slackbuilds/$SRC/slack-desc
+install -m 644 $CWD/slack-required   $PKG/usr/src/slackbuilds/$SRC/slack-required
+install -m 644 $CWD/$NAME.SlackBuild $PKG/usr/src/slackbuilds/$SRC/$NAME.SlackBuild
 
 # Build the package:
 cd $PKG
